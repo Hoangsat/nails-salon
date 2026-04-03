@@ -21,7 +21,7 @@ export const demoSalonProfile: SalonProfile = {
   name: "Polish Studio",
   tagline: "Luxury manicures, polished pedicures, and design-led nail artistry in London.",
   description:
-    "A sample salon profile for the showcase platform with enough structured content to exercise the public pages and future admin tooling.",
+    "A polished London nail studio demo with signature manicures, refined pedicures, modern design work, direct online booking, and a premium editorial presentation.",
   phone: "+44 20 7946 0123",
   email: "hello@polishstudio.example",
   addressLine1: "18 Rose Lane",
@@ -576,6 +576,7 @@ export const demoSalonDataset = {
   gallery: demoGallery,
   reviews: demoReviews,
 };
+
 
 
 

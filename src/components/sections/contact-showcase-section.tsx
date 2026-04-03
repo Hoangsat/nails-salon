@@ -114,6 +114,8 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
                     <Link
                       key={link.label}
                       href={link.href}
+                      target={link.href === "#" ? undefined : "_blank"}
+                      rel={link.href === "#" ? undefined : "noreferrer"}
                       className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-sm text-foreground transition-colors hover:bg-secondary/55"
                     >
                       <span className="flex items-center gap-3">
@@ -169,3 +171,4 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
     </section>
   );
 }
+

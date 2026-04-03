@@ -287,7 +287,7 @@ values
     '11111111-1111-1111-1111-111111111111',
     'restorative-manicure',
     'Signature Pedicure',
-    'Care',
+    'Pedicure',
     'Cuticle tidy, exfoliation, massage, and a glossy gel finish for toes.',
     'A commercially familiar pedicure service presented with the same refined tone as the manicure menu.',
     50,
@@ -301,7 +301,7 @@ values
     '11111111-1111-1111-1111-111111111111',
     'gel-removal-reset',
     'Spa Pedicure Refresh',
-    'Care',
+    'Pedicure',
     'A quicker tidy-up pedicure for returning guests between full appointments.',
     'Ideal for maintenance visits, polish refreshes, and keeping the pedicure menu commercially familiar.',
     40,
@@ -401,6 +401,7 @@ values
   ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333332', '44444444-4444-4444-4444-444444444403'),
   ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333332', '44444444-4444-4444-4444-444444444408'),
   ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444401'),
+  ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444407'),
   ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444405'),
   ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', '44444444-4444-4444-4444-444444444406')
 on conflict do nothing;
@@ -809,6 +810,9 @@ set
   custom_price_cents = 5200
 where staff_id = '33333333-3333-3333-3333-333333333332'
   and service_id = '44444444-4444-4444-4444-444444444402';
+
+
+
 
 
 
