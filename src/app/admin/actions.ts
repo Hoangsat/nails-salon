@@ -4,7 +4,16 @@ import { DateTime } from "luxon";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getAdminLoginRedirect, getCurrentAdminUser, isSupabaseAuthConfigured } from "@/lib/auth/supabase-auth";
+import {
+  getAdminAccessDeniedMessage,
+  getAdminConfigErrorMessage,
+  getAdminLoginRedirect,
+  getCurrentAdminUser,
+  isAdminUserAllowed,
+  isSupabaseAuthConfigured,
+  shouldAllowOpenAdminPreview,
+} from "@/lib/auth/supabase-auth";
+import { resendBookingConfirmationNotificationById } from "@/lib/notifications/booking-notifications";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { DatabaseBookingStatus } from "@/types/database";
 import type { StaffServiceLinkInput } from "@/types/admin";
@@ -16,6 +25,12 @@ async function requireAdminClient() {
     if (!currentUser) {
       redirect(getAdminLoginRedirect("/admin"));
     }
+
+    if (!isAdminUserAllowed(currentUser)) {
+      redirect(getAdminLoginRedirect("/admin", getAdminAccessDeniedMessage()));
+    }
+  } else if (!shouldAllowOpenAdminPreview()) {
+    redirect(getAdminLoginRedirect("/admin", getAdminConfigErrorMessage()));
   }
 
   const client = createServerSupabaseClient();
@@ -92,6 +107,24 @@ export async function updateBookingStatus(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/admin/appointments");
   revalidatePath("/admin/calendar");
+}
+
+export async function resendFailedBookingNotification(formData: FormData) {
+  await requireAdminClient();
+  const notificationId = readString(formData, "notification_id");
+
+  if (!notificationId) {
+    redirect("/admin/notifications?resend=error");
+  }
+
+  const result = await resendBookingConfirmationNotificationById(notificationId);
+  revalidatePath("/admin/notifications");
+
+  if (result.status === "sent") {
+    redirect("/admin/notifications?resend=sent");
+  }
+
+  redirect("/admin/notifications?resend=error");
 }
 
 export async function upsertService(formData: FormData) {
@@ -291,6 +324,7 @@ export async function updateSalonSettings(formData: FormData) {
       postal_code: readNullableString(formData, "postal_code"),
       country_code: readString(formData, "country_code") || "GB",
       website_url: readNullableString(formData, "website_url"),
+      facebook_url: readNullableString(formData, "facebook_url"),
       instagram_url: readNullableString(formData, "instagram_url"),
       booking_notice: readNullableString(formData, "booking_notice"),
       timezone: readString(formData, "timezone") || "Europe/London",
@@ -422,5 +456,7 @@ export async function updateThemeSettings(formData: FormData) {
 
   revalidatePublicAndAdmin();
 }
+
+
 
 

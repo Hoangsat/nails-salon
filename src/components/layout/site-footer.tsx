@@ -15,7 +15,7 @@ export async function SiteFooter() {
             {themeSettings.brandName}
           </p>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            A polished salon website demo with live booking, admin management, theme controls, and confirmation emails built on a reusable Next.js foundation.
+            A polished salon website with live booking, admin management, theme controls, and confirmation emails built on a reusable Next.js foundation.
           </p>
         </div>
 

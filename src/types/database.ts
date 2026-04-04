@@ -24,6 +24,7 @@ export type SalonsRow = {
   timezone: string;
   currency_code: string;
   website_url: string | null;
+  facebook_url: string | null;
   instagram_url: string | null;
   booking_notice: string | null;
   is_active: boolean;
@@ -221,3 +222,16 @@ export type ReviewsRow = {
   sort_order: number;
   created_at: string;
 };
+
+
+export type ShowcaseLeadsRow = {
+  id: string;
+  name: string;
+  email: string;
+  salon_name: string | null;
+  current_setup: string | null;
+  notes: string | null;
+  source_page: string;
+  created_at: string;
+};
+

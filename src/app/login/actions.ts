@@ -4,9 +4,13 @@ import { redirect } from "next/navigation";
 
 import {
   createServerAuthClient,
+  getAdminAccessDeniedMessage,
+  getAdminConfigErrorMessage,
   isSupabaseAuthConfigured,
   normalizeAdminRedirectPath,
+  shouldAllowOpenAdminPreview,
 } from "@/lib/auth/supabase-auth";
+import { isAdminEmailAllowed } from "@/lib/config/production-readiness";
 
 function readString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -32,7 +36,11 @@ export async function loginAction(formData: FormData) {
   const nextPath = normalizeAdminRedirectPath(readString(formData, "next"));
 
   if (!isSupabaseAuthConfigured()) {
-    redirect(nextPath);
+    if (shouldAllowOpenAdminPreview()) {
+      redirect(nextPath);
+    }
+
+    redirect(buildLoginRedirect(nextPath, getAdminConfigErrorMessage()));
   }
 
   const email = readString(formData, "email");
@@ -43,10 +51,15 @@ export async function loginAction(formData: FormData) {
   }
 
   const client = createServerAuthClient();
-  const { error } = await client.auth.signInWithPassword({ email, password });
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
 
   if (error) {
     redirect(buildLoginRedirect(nextPath, error.message));
+  }
+
+  if (!isAdminEmailAllowed(data.user?.email ?? email)) {
+    await client.auth.signOut();
+    redirect(buildLoginRedirect(nextPath, getAdminAccessDeniedMessage()));
   }
 
   redirect(nextPath);
@@ -61,4 +74,3 @@ export async function logoutAction() {
   await client.auth.signOut();
   redirect("/login");
 }
-

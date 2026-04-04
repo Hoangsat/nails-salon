@@ -260,12 +260,12 @@ export function ShowcaseDemoRequestSection({ requestState }: ShowcaseDemoRequest
           <CardContent className="space-y-5">
             {requestState === "sent" ? (
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                Demo request received for showcase purposes. This form is intentionally lightweight and does not create a CRM record in this phase.
+                Thanks, your request has been saved and is ready for a follow-up conversation.
               </div>
             ) : null}
             {requestState === "error" ? (
               <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                Add your name and email so the demo request can be acknowledged cleanly.
+                We could not save that request just now. Check the required fields and try again.
               </div>
             ) : null}
 

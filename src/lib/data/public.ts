@@ -1,6 +1,7 @@
 ﻿import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { shouldAllowDemoFallback } from "@/lib/config/production-readiness";
 import { demoSalonDataset, demoSalonProfile } from "@/lib/data/demo";
 import {
   mapGalleryImageRow,
@@ -36,6 +37,14 @@ import type {
 
 const defaultSalonSlug = demoSalonProfile.slug;
 
+function resolveDemoFallback<T>(fallback: () => T, errorMessage: string): T {
+  if (shouldAllowDemoFallback()) {
+    return fallback();
+  }
+
+  throw new Error(errorMessage);
+}
+
 async function resolveSalonRow(client: SupabaseClient, slug: string) {
   const { data, error } = await client
     .from("salons")
@@ -59,19 +68,23 @@ async function withSalonFallback<T>(
   const client = createServerSupabaseClient();
 
   if (!client) {
-    return fallback();
+    return resolveDemoFallback(fallback, "Supabase is not configured and demo fallback is disabled.");
   }
 
   try {
     const salonRow = await resolveSalonRow(client, slug);
 
     if (!salonRow) {
-      return fallback();
+      return resolveDemoFallback(fallback, `Active salon '${slug}' could not be loaded.`);
     }
 
     return await query(client, salonRow);
-  } catch {
-    return fallback();
+  } catch (error) {
+    if (shouldAllowDemoFallback()) {
+      return fallback();
+    }
+
+    throw error;
   }
 }
 
@@ -95,7 +108,10 @@ export const getSalonThemeSettings = cache(
           .maybeSingle();
 
         if (error || !data) {
-          return demoSalonDataset.themeSettings;
+          return resolveDemoFallback(
+            () => demoSalonDataset.themeSettings,
+            "Salon theme settings could not be loaded.",
+          );
         }
 
         return mapThemeSettingsRow(data as SalonThemeSettingsRow);
@@ -117,7 +133,7 @@ export const getSalonStaff = cache(async (slug = defaultSalonSlug): Promise<Staf
         .order("sort_order", { ascending: true });
 
       if (error || !data) {
-        return demoSalonDataset.staff;
+        return resolveDemoFallback(() => demoSalonDataset.staff, "Salon staff could not be loaded.");
       }
 
       return (data as StaffRow[]).map(mapStaffRow);
@@ -139,7 +155,10 @@ export const getSalonWorkingHours = cache(
           .order("sort_order", { ascending: true });
 
         if (error || !data) {
-          return demoSalonDataset.workingHours;
+          return resolveDemoFallback(
+            () => demoSalonDataset.workingHours,
+            "Salon working hours could not be loaded.",
+          );
         }
 
         return (data as WorkingHoursRow[]).map(mapWorkingHoursRow);
@@ -178,7 +197,10 @@ export const getSalonServicesWithAddons = cache(
           !addonsResult.data ||
           !staffLinksResult.data
         ) {
-          return demoSalonDataset.services;
+          return resolveDemoFallback(
+            () => demoSalonDataset.services,
+            "Salon services and add-ons could not be loaded.",
+          );
         }
 
         const addonsByService = new Map<string, ReturnType<typeof mapServiceAddonRow>[]>();
@@ -216,7 +238,7 @@ export const getSalonGallery = cache(async (slug = defaultSalonSlug): Promise<Ga
         .order("sort_order", { ascending: true });
 
       if (error || !data) {
-        return demoSalonDataset.gallery;
+        return resolveDemoFallback(() => demoSalonDataset.gallery, "Salon gallery could not be loaded.");
       }
 
       return (data as GalleryImagesRow[]).map(mapGalleryImageRow);
@@ -237,7 +259,7 @@ export const getSalonReviews = cache(async (slug = defaultSalonSlug): Promise<Re
         .order("sort_order", { ascending: true });
 
       if (error || !data) {
-        return demoSalonDataset.reviews;
+        return resolveDemoFallback(() => demoSalonDataset.reviews, "Salon reviews could not be loaded.");
       }
 
       return (data as ReviewsRow[]).map(mapReviewRow);

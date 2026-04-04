@@ -2,15 +2,22 @@
 import { redirect } from "next/navigation";
 import { AlertCircle, LockKeyhole, Palette, ShieldCheck } from "lucide-react";
 
+import { logoutAction, loginAction } from "@/app/login/actions";
 import { AdminInput } from "@/components/admin/admin-ui";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeedbackPanel } from "@/components/ui/feedback-panel";
-import { getCurrentAdminUser, isSupabaseAuthConfigured, normalizeAdminRedirectPath } from "@/lib/auth/supabase-auth";
+import {
+  getAdminAccessDeniedMessage,
+  getCurrentAdminUser,
+  isAdminUserAllowed,
+  isSupabaseAuthConfigured,
+  normalizeAdminRedirectPath,
+  shouldAllowOpenAdminPreview,
+} from "@/lib/auth/supabase-auth";
+import { getProductionReadiness } from "@/lib/config/production-readiness";
 import { getSalonThemeSettings } from "@/lib/data/public";
-
-import { loginAction } from "./actions";
 
 type LoginPageProps = {
   searchParams?: {
@@ -32,7 +39,7 @@ const loginHighlights = [
   {
     icon: ShieldCheck,
     title: "Light access model",
-    description: "Any authenticated Supabase user counts as an admin for now.",
+    description: "Only allowlisted Supabase users can access the admin outside local demo mode.",
   },
   {
     icon: Palette,
@@ -43,17 +50,24 @@ const loginHighlights = [
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const authEnabled = isSupabaseAuthConfigured();
+  const demoPreviewEnabled = shouldAllowOpenAdminPreview();
   const nextPath = normalizeAdminRedirectPath(readSearchParam(searchParams?.next));
   const errorMessage = readSearchParam(searchParams?.error);
   const themeSettings = await getSalonThemeSettings();
+  const readiness = getProductionReadiness();
+  const currentUser = authEnabled ? await getCurrentAdminUser() : null;
+  const currentUserAllowed = isAdminUserAllowed(currentUser);
 
-  if (authEnabled) {
-    const currentUser = await getCurrentAdminUser();
-
-    if (currentUser) {
-      redirect(nextPath);
-    }
+  if (currentUser && currentUserAllowed) {
+    redirect(nextPath);
   }
+
+  const readinessIssues = [
+    readiness.missing.supabase ? "Supabase URL/anon key" : null,
+    readiness.missing.serviceRole ? "Supabase service role key" : null,
+    readiness.missing.adminAllowlist ? "ADMIN_ALLOWLIST_EMAILS" : null,
+    readiness.missing.resend ? "Resend email config" : null,
+  ].filter(Boolean) as string[];
 
   return (
     <section className="py-16 sm:py-20">
@@ -102,13 +116,26 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </CardHeader>
           <CardContent className="space-y-6">
             {!authEnabled ? (
-              <FeedbackPanel variant="warning" title="Supabase Auth is not configured in this environment yet." icon={<AlertCircle className="h-4 w-4" />}>
-                The login form is disabled for this preview, and admin access remains open so the demo can still be explored locally.
-                <div className="mt-4">
-                  <Button asChild>
-                    <Link href="/admin">Continue to the admin demo</Link>
-                  </Button>
-                </div>
+              demoPreviewEnabled ? (
+                <FeedbackPanel variant="warning" title="Supabase Auth is not configured in this environment yet." icon={<AlertCircle className="h-4 w-4" />}>
+                  The login form is disabled for this preview, and admin access remains open only because demo fallback is enabled in development or explicit demo mode.
+                  <div className="mt-4">
+                    <Button asChild>
+                      <Link href="/admin">Continue to the admin demo</Link>
+                    </Button>
+                  </div>
+                </FeedbackPanel>
+              ) : (
+                <FeedbackPanel variant="error" title="Admin access is locked until production config is complete." icon={<AlertCircle className="h-4 w-4" />}>
+                  Missing configuration: {readinessIssues.join(", ") || "Supabase Auth setup"}.
+                </FeedbackPanel>
+              )
+            ) : currentUser && !currentUserAllowed ? (
+              <FeedbackPanel variant="error" title="Admin access denied" icon={<AlertCircle className="h-4 w-4" />}>
+                {errorMessage ?? getAdminAccessDeniedMessage()}
+                <form action={logoutAction} className="mt-4">
+                  <Button type="submit" variant="outline">Log out</Button>
+                </form>
               </FeedbackPanel>
             ) : (
               <form action={loginAction} className="grid gap-4">
@@ -138,8 +165,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </form>
             )}
 
-            <FeedbackPanel title="Quick setup note">
-              Create a single email/password user in Supabase Auth, add the project URL and anon key to your environment, and the protected admin flow will work without adding roles or customer accounts.
+            <FeedbackPanel title="Production readiness">
+              {readiness.isProductionReady
+                ? "Supabase, admin allowlist, server write access, and Resend are configured for a production-style environment."
+                : `Still missing: ${readinessIssues.join(", ") || "nothing blocking detected"}.`}
             </FeedbackPanel>
           </CardContent>
         </Card>

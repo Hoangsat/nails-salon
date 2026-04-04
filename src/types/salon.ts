@@ -26,6 +26,7 @@ export type SalonProfile = {
   timezone: string;
   currencyCode: string;
   websiteUrl: string | null;
+  facebookUrl: string | null;
   instagramUrl: string | null;
   bookingNotice: string | null;
   isActive: boolean;
@@ -216,3 +217,5 @@ export type Review = {
   sortOrder: number;
   createdAt: string;
 };
+
+

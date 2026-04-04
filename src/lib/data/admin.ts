@@ -1,6 +1,8 @@
 ﻿import { DateTime } from "luxon";
 import { unstable_noStore as noStore } from "next/cache";
 
+import { shouldAllowDemoFallback } from "@/lib/config/production-readiness";
+
 import { demoSalonDataset, demoSalonProfile, demoThemeSettings } from "@/lib/data/demo";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
@@ -55,6 +57,7 @@ function demoSalonRow(): SalonsRow {
     timezone: demoSalonProfile.timezone,
     currency_code: demoSalonProfile.currencyCode,
     website_url: demoSalonProfile.websiteUrl,
+    facebook_url: demoSalonProfile.facebookUrl,
     instagram_url: demoSalonProfile.instagramUrl,
     booking_notice: demoSalonProfile.bookingNotice,
     is_active: demoSalonProfile.isActive,
@@ -256,8 +259,13 @@ async function resolveAdminContext(): Promise<{ client: ReturnType<typeof create
   noStore();
   const client = createServerSupabaseClient();
   const fallbackSalon = demoSalonRow();
+  const demoModeEnabled = shouldAllowDemoFallback();
 
   if (!client) {
+    if (!demoModeEnabled) {
+      throw new Error("Supabase is not configured and admin demo fallback is disabled.");
+    }
+
     return {
       client,
       context: {
@@ -292,11 +300,25 @@ async function resolveAdminContext(): Promise<{ client: ReturnType<typeof create
     .limit(1)
     .maybeSingle();
 
+  if (fallbackQuery.data) {
+    return {
+      client,
+      context: {
+        salon: fallbackQuery.data as SalonsRow,
+        isDemoMode: false,
+      },
+    };
+  }
+
+  if (!demoModeEnabled) {
+    throw new Error("No active salon record could be loaded for the admin.");
+  }
+
   return {
     client,
     context: {
-      salon: (fallbackQuery.data as SalonsRow | null) ?? fallbackSalon,
-      isDemoMode: !fallbackQuery.data,
+      salon: fallbackSalon,
+      isDemoMode: true,
     },
   };
 }
@@ -363,7 +385,19 @@ async function getReadDataset() {
   return {
     context,
     salon: context.salon,
-    themeSettings: (themeResult.data as SalonThemeSettingsRow | null) ?? demoThemeRow(),
+    themeSettings: (() => {
+      const themeSettings = themeResult.data as SalonThemeSettingsRow | null;
+
+      if (themeSettings) {
+        return themeSettings;
+      }
+
+      if (context.isDemoMode) {
+        return demoThemeRow();
+      }
+
+      throw new Error("Salon theme settings could not be loaded for the admin.");
+    })(),
     staff: (staffResult.data as StaffRow[] | null) ?? [],
     services: (servicesResult.data as ServicesRow[] | null) ?? [],
     addons: (addonsResult.data as ServiceAddonsRow[] | null) ?? [],
@@ -598,5 +632,9 @@ export async function getRuntimeThemeSettingsRow(): Promise<SalonThemeSettingsRo
   const dataset = await getReadDataset();
   return dataset.themeSettings;
 }
+
+
+
+
 
 

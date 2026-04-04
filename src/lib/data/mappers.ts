@@ -48,6 +48,7 @@ export function mapSalonRow(row: SalonsRow): SalonProfile {
     timezone: row.timezone,
     currencyCode: row.currency_code,
     websiteUrl: row.website_url,
+    facebookUrl: row.facebook_url,
     instagramUrl: row.instagram_url,
     bookingNotice: row.booking_notice,
     isActive: row.is_active,
@@ -223,3 +224,5 @@ export function createThemeConfigFromSettings(
     heroImage: theme.heroImageUrl ?? fallbackHeroImage,
   };
 }
+
+

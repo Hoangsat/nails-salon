@@ -22,8 +22,8 @@ export function ReviewsPreviewSection({ reviews }: ReviewsPreviewSectionProps) {
       <Container className="space-y-10">
         <SectionHeading
           eyebrow="Client Reviews"
-          title="Social proof that helps the demo feel established"
-          description="Review cards now pull from the structured review dataset and are styled to read more like a premium salon recommendation wall than temporary placeholders."
+          title="Social proof that helps the studio feel established"
+          description="Review cards pull from the structured review dataset and read like a premium salon recommendation wall rather than a basic quote strip."
         />
 
         <div className="grid gap-6 lg:grid-cols-3">

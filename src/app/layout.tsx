@@ -10,6 +10,8 @@ import { createThemeConfigFromSettings } from "@/lib/data/mappers";
 import { getThemeStyles, themeFontVariables } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -43,3 +45,4 @@ export default async function RootLayout({
     </html>
   );
 }
+

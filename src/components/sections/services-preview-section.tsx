@@ -29,7 +29,7 @@ export function ServicesPreviewSection({
           <SectionHeading
             eyebrow="Featured Services"
             title="The services guests compare first, presented with clarity"
-            description="Featured services pull directly from the structured catalogue, including timing and price points, so the public page feels grounded in real operational data instead of placeholder copy."
+            description="Featured services pull directly from the structured catalogue, including timing and price points, so the public page feels grounded in real operational data."
           />
           <Button asChild variant="outline">
             <Link href="/services">Browse full service menu</Link>

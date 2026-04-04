@@ -14,6 +14,7 @@
   timezone,
   currency_code,
   website_url,
+  facebook_url,
   instagram_url,
   booking_notice,
   is_active
@@ -23,7 +24,7 @@ values (
   'polish-studio',
   'Polish Studio',
   'Luxury manicures, polished pedicures, and design-led nail artistry in London.',
-  'A polished London nail studio demo with signature manicures, refined pedicures, modern design work, direct online booking, and a premium editorial presentation.',
+  'A refined city nail studio with signature manicures, polished pedicures, modern design work, direct online booking, and a premium editorial atmosphere.',
   '+44 20 7946 0123',
   'hello@polishstudio.example',
   '18 Rose Lane',
@@ -34,6 +35,7 @@ values (
   'Europe/London',
   'GBP',
   'https://polishstudio.example',
+  'https://facebook.com/polishstudio',
   'https://instagram.com/polishstudio',
   'Appointments are confirmed against live availability and followed by a polished confirmation email when delivery is configured.',
   true
@@ -54,6 +56,7 @@ set
   timezone = excluded.timezone,
   currency_code = excluded.currency_code,
   website_url = excluded.website_url,
+  facebook_url = excluded.facebook_url,
   instagram_url = excluded.instagram_url,
   booking_notice = excluded.booking_notice,
   is_active = excluded.is_active;
@@ -88,7 +91,7 @@ values (
   'pill',
   '1.4rem',
   '/images/gallery-minimal.svg',
-  'Close-up premium neutral manicure photography placeholder'
+  'Close-up of a glossy neutral manicure in soft studio lighting'
 )
 on conflict (salon_id) do update
 set
@@ -810,6 +813,10 @@ set
   custom_price_cents = 5200
 where staff_id = '33333333-3333-3333-3333-333333333332'
   and service_id = '44444444-4444-4444-4444-444444444402';
+
+
+
+
 
 
 

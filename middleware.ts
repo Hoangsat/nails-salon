@@ -2,8 +2,13 @@
 
 import {
   createMiddlewareAuthClient,
+  getAdminAccessDeniedMessage,
+  getAdminConfigErrorMessage,
+  getAdminLoginRedirect,
+  isAdminUserAllowed,
   isSupabaseAuthConfigured,
   normalizeAdminRedirectPath,
+  shouldAllowOpenAdminPreview,
 } from "@/lib/auth/supabase-auth";
 
 function withResponseCookies(source: NextResponse, target: NextResponse) {
@@ -14,8 +19,32 @@ function withResponseCookies(source: NextResponse, target: NextResponse) {
   return target;
 }
 
+function redirectToLogin(request: NextRequest, response: NextResponse, nextPath?: string, error?: string) {
+  const redirectUrl = request.nextUrl.clone();
+  redirectUrl.pathname = "/login";
+  redirectUrl.search = "";
+
+  const redirectTarget = getAdminLoginRedirect(nextPath, error);
+  const [pathname, query = ""] = redirectTarget.split("?");
+  redirectUrl.pathname = pathname;
+  redirectUrl.search = query ? `?${query}` : "";
+
+  return withResponseCookies(response, NextResponse.redirect(redirectUrl));
+}
+
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
   if (!isSupabaseAuthConfigured()) {
+    if (pathname.startsWith("/admin") && !shouldAllowOpenAdminPreview()) {
+      return redirectToLogin(
+        request,
+        NextResponse.next({ request }),
+        `${pathname}${request.nextUrl.search}`,
+        getAdminConfigErrorMessage(),
+      );
+    }
+
     return NextResponse.next();
   }
 
@@ -24,10 +53,9 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
 
   if (pathname === "/login") {
-    if (!user) {
+    if (!user || !isAdminUserAllowed(user)) {
       return response;
     }
 
@@ -39,17 +67,13 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin") && !user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    redirectUrl.search = "";
-
     const nextPath = normalizeAdminRedirectPath(`${pathname}${request.nextUrl.search}`);
+    return redirectToLogin(request, response, nextPath);
+  }
 
-    if (nextPath !== "/admin") {
-      redirectUrl.searchParams.set("next", nextPath);
-    }
-
-    return withResponseCookies(response, NextResponse.redirect(redirectUrl));
+  if (pathname.startsWith("/admin") && user && !isAdminUserAllowed(user)) {
+    const nextPath = normalizeAdminRedirectPath(`${pathname}${request.nextUrl.search}`);
+    return redirectToLogin(request, response, nextPath, getAdminAccessDeniedMessage());
   }
 
   return response;
@@ -58,4 +82,3 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/login", "/admin/:path*"],
 };
-

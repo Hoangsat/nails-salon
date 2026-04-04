@@ -3,9 +3,12 @@ import type { User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
+import { isAdminEmailAllowed, shouldAllowDemoFallback } from "@/lib/config/production-readiness";
 import { getSupabaseEnvConfig } from "@/lib/supabase/config";
 
 const DEFAULT_ADMIN_REDIRECT = "/admin";
+const ADMIN_CONFIG_ERROR = "Admin sign-in is not configured for this environment.";
+const ADMIN_ACCESS_DENIED = "This account is not allowed to access the admin.";
 
 function setCookieValues(
   target: {
@@ -22,6 +25,22 @@ export function isSupabaseAuthConfigured() {
   return getSupabaseEnvConfig() !== null;
 }
 
+export function shouldAllowOpenAdminPreview() {
+  return !isSupabaseAuthConfigured() && shouldAllowDemoFallback();
+}
+
+export function getAdminConfigErrorMessage() {
+  return ADMIN_CONFIG_ERROR;
+}
+
+export function getAdminAccessDeniedMessage() {
+  return ADMIN_ACCESS_DENIED;
+}
+
+export function isAdminUserAllowed(user: Pick<User, "email"> | null | undefined) {
+  return isAdminEmailAllowed(user?.email);
+}
+
 export function normalizeAdminRedirectPath(nextPath?: string | null) {
   if (!nextPath) {
     return DEFAULT_ADMIN_REDIRECT;
@@ -34,11 +53,20 @@ export function normalizeAdminRedirectPath(nextPath?: string | null) {
   return nextPath;
 }
 
-export function getAdminLoginRedirect(nextPath?: string | null) {
+export function getAdminLoginRedirect(nextPath?: string | null, error?: string) {
   const safeNextPath = normalizeAdminRedirectPath(nextPath);
-  return safeNextPath === DEFAULT_ADMIN_REDIRECT
-    ? "/login"
-    : `/login?next=${encodeURIComponent(safeNextPath)}`;
+  const params = new URLSearchParams();
+
+  if (safeNextPath !== DEFAULT_ADMIN_REDIRECT) {
+    params.set("next", safeNextPath);
+  }
+
+  if (error) {
+    params.set("error", error);
+  }
+
+  const query = params.toString();
+  return query ? `/login?${query}` : "/login";
 }
 
 function requireSupabaseAuthConfig() {
@@ -102,4 +130,3 @@ export async function getCurrentAdminUser(): Promise<User | null> {
 
   return user ?? null;
 }
-

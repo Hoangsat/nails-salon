@@ -23,8 +23,8 @@ export function GalleryShowcaseSection({ items }: GalleryShowcaseSectionProps) {
       <Container className="space-y-8">
         <SectionHeading
           eyebrow="Portfolio"
-          title="A gallery layout that feels closer to a real nail portfolio feed"
-          description="The gallery is still powered by structured image data, but the presentation now leans into a more scrollable, social-first showcase that is ready to swap in real client work photography."
+          title="A gallery layout shaped like a real nail portfolio feed"
+          description="The gallery uses structured image data in a more social, image-led layout so the portfolio feels polished, visual, and easy to browse."
         />
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
@@ -61,7 +61,7 @@ export function GalleryShowcaseSection({ items }: GalleryShowcaseSectionProps) {
 
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-[calc(var(--radius)+0.1rem)] border border-border/70 bg-secondary/25 px-5 py-4 text-sm text-muted-foreground">
           <p>
-            This grid is ready for real work photos, close-up nail details, and campaign content without changing the gallery structure.
+            This grid comfortably supports close-up sets, detail shots, and campaign imagery without changing the gallery structure.
           </p>
           <Button asChild variant="outline" size="sm">
             <Link href="/booking">Book from the portfolio</Link>

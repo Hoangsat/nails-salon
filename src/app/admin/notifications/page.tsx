@@ -1,10 +1,18 @@
 ﻿import { DateTime } from "luxon";
 
+import { resendFailedBookingNotification } from "@/app/admin/actions";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeedbackPanel } from "@/components/ui/feedback-panel";
 import { getAdminNotificationsData } from "@/lib/data/admin";
+
+type AdminNotificationsPageProps = {
+  searchParams?: {
+    resend?: string | string[];
+  };
+};
 
 const statusStyles: Record<string, string> = {
   sent: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -12,8 +20,13 @@ const statusStyles: Record<string, string> = {
   failed: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
-export default async function AdminNotificationsPage() {
+function readSearchParam(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function AdminNotificationsPage({ searchParams }: AdminNotificationsPageProps) {
   const data = await getAdminNotificationsData();
+  const resendState = readSearchParam(searchParams?.resend);
   const statusCounts = {
     sent: data.notifications.filter((item) => item.notification.status === "sent").length,
     pending: data.notifications.filter((item) => item.notification.status === "pending").length,
@@ -25,8 +38,19 @@ export default async function AdminNotificationsPage() {
       <AdminPageHeader
         eyebrow="Notifications"
         title="Notifications log"
-        description="A read-only audit view of attempted booking emails. Pending, sent, and failed outcomes are surfaced here so the salon can follow up manually if needed."
+        description="A delivery log for booking emails. Failed confirmation emails can now be resent manually without leaving the admin."
       />
+
+      {resendState === "sent" ? (
+        <FeedbackPanel title="Confirmation email resent.">
+          A new notification attempt has been logged and the delivery status list has been refreshed.
+        </FeedbackPanel>
+      ) : null}
+      {resendState === "error" ? (
+        <FeedbackPanel title="Unable to resend that email.">
+          Check the linked booking, recipient email, and email provider configuration before trying again.
+        </FeedbackPanel>
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-3">
         {[
@@ -95,6 +119,19 @@ export default async function AdminNotificationsPage() {
                   <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                     {item.notification.error_message}
                   </div>
+                ) : null}
+                {item.notification.status === "failed" && !data.context.isDemoMode ? (
+                  <form action={resendFailedBookingNotification} className="mt-4">
+                    <input type="hidden" name="notification_id" value={item.notification.id} />
+                    <AdminSubmitButton
+                      label="Resend confirmation"
+                      pendingLabel="Resending..."
+                      variant="outline"
+                      size="sm"
+                    />
+                  </form>
+                ) : item.notification.status === "failed" ? (
+                  <p className="mt-4 text-sm text-muted-foreground">Reconnect Supabase and Resend to enable manual resend actions.</p>
                 ) : null}
               </div>
             ))

@@ -74,6 +74,9 @@ export default async function AdminSettingsPage() {
             <AdminField label="Website URL" className="md:col-span-2">
               <AdminInput name="website_url" defaultValue={data.context.salon.website_url ?? ""} />
             </AdminField>
+            <AdminField label="Facebook URL" className="md:col-span-2">
+              <AdminInput name="facebook_url" defaultValue={data.context.salon.facebook_url ?? ""} />
+            </AdminField>
             <AdminField label="Instagram URL" className="md:col-span-2">
               <AdminInput name="instagram_url" defaultValue={data.context.salon.instagram_url ?? ""} />
             </AdminField>
@@ -225,3 +228,4 @@ export default async function AdminSettingsPage() {
     </AdminShell>
   );
 }
+

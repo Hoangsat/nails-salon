@@ -82,10 +82,10 @@ export function HeroSection({ salon, themeSettings, services, staff, gallery }: 
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/45 via-foreground/5 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-background sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-background/80">
-                  Photo-ready hero layout
+                  Editorial studio imagery
                 </p>
                 <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                  Built to hold real salon photography, close-up nail work, or interior imagery.
+                  Close-up nail detail, polish texture, and studio atmosphere take the lead in this opening frame.
                 </h2>
               </div>
             </div>

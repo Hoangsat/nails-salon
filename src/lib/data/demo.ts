@@ -21,7 +21,7 @@ export const demoSalonProfile: SalonProfile = {
   name: "Polish Studio",
   tagline: "Luxury manicures, polished pedicures, and design-led nail artistry in London.",
   description:
-    "A polished London nail studio demo with signature manicures, refined pedicures, modern design work, direct online booking, and a premium editorial presentation.",
+    "A refined city nail studio with signature manicures, polished pedicures, modern design work, direct online booking, and a premium editorial atmosphere.",
   phone: "+44 20 7946 0123",
   email: "hello@polishstudio.example",
   addressLine1: "18 Rose Lane",
@@ -33,6 +33,7 @@ export const demoSalonProfile: SalonProfile = {
   timezone: "Europe/London",
   currencyCode: "GBP",
   websiteUrl: "https://polishstudio.example",
+  facebookUrl: "https://facebook.com/polishstudio",
   instagramUrl: "https://instagram.com/polishstudio",
   bookingNotice:
     "Appointments are confirmed against live availability and followed by a polished confirmation email when delivery is configured.",
@@ -55,7 +56,7 @@ export const demoThemeSettings: SalonThemeSettings = {
   buttonStyle: "pill",
   borderRadius: "1.4rem",
   heroImageUrl: "/images/gallery-minimal.svg",
-  heroImageAlt: "Close-up premium neutral manicure photography placeholder",
+  heroImageAlt: "Close-up of a glossy neutral manicure in soft studio lighting",
   createdAt,
   updatedAt: createdAt,
 };
@@ -576,6 +577,8 @@ export const demoSalonDataset = {
   gallery: demoGallery,
   reviews: demoReviews,
 };
+
+
 
 
 

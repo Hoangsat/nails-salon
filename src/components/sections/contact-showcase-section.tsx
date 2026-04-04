@@ -11,6 +11,7 @@ type ContactShowcaseSectionProps = {
     phone: string | null;
     email: string | null;
     websiteUrl: string | null;
+    facebookUrl: string | null;
     instagramUrl: string | null;
     addressLine1: string | null;
     city: string | null;
@@ -21,47 +22,43 @@ type ContactShowcaseSectionProps = {
   workingHours: string[];
 };
 
-function slugifyHandle(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "")
-    .slice(0, 40);
-}
-
 function buildWhatsappLink(phone: string | null) {
   if (!phone) {
-    return "#";
+    return null;
   }
 
   const digits = phone.replace(/\D/g, "");
-  return digits ? `https://wa.me/${digits}` : "#";
+  return digits ? `https://wa.me/${digits}` : null;
 }
 
-function buildFacebookLink(name: string) {
-  return `https://facebook.com/${slugifyHandle(name)}`;
+function formatAddress(salon: ContactShowcaseSectionProps["salon"]) {
+  return [salon.addressLine1, salon.city, salon.region, salon.postalCode]
+    .filter(Boolean)
+    .join(", ");
 }
 
 export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseSectionProps) {
+  const address = formatAddress(salon);
   const quickActions = [
     {
       label: "WhatsApp",
       href: buildWhatsappLink(salon.phone),
-      helper: salon.phone ?? "Message the salon",
+      helper: salon.phone ?? "Message the studio directly",
       icon: MessageCircle,
     },
     {
       label: "Facebook",
-      href: buildFacebookLink(salon.name),
-      helper: `${salon.name} on Facebook`,
+      href: salon.facebookUrl,
+      helper: salon.facebookUrl ? "Follow updates and salon news" : "Facebook profile link",
       icon: Facebook,
     },
     {
       label: "Instagram",
-      href: salon.instagramUrl ?? "#",
-      helper: salon.instagramUrl ? "View latest work and updates" : "Instagram profile",
+      href: salon.instagramUrl,
+      helper: salon.instagramUrl ? "View recent sets and studio updates" : "Instagram profile link",
       icon: Instagram,
     },
-  ];
+  ].filter((item) => Boolean(item.href));
 
   return (
     <section className="py-16 sm:py-20">
@@ -74,15 +71,13 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
           <CardContent className="space-y-5">
             <div className="rounded-[calc(var(--radius)-0.4rem)] border border-border/70 bg-background/80 p-5">
               <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Location</p>
-              <p className="mt-3 text-base leading-7 text-foreground">
-                {[salon.addressLine1, salon.city, salon.region, salon.postalCode].filter(Boolean).join(", ")}
-              </p>
+              <p className="mt-3 text-base leading-7 text-foreground">{address}</p>
             </div>
             <div className="rounded-[calc(var(--radius)-0.4rem)] border border-border/70 bg-gradient-to-br from-primary/10 via-background to-accent/15 p-5">
-              <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Map Preview</p>
+              <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Location Preview</p>
               <div className="mt-4 flex aspect-[4/3] items-end rounded-[calc(var(--radius)-0.4rem)] border border-border/70 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.9),transparent_30%),linear-gradient(135deg,rgba(233,125,108,0.15),rgba(244,193,199,0.35),rgba(255,255,255,0.8))] p-5">
                 <div className="rounded-2xl bg-background/90 px-4 py-3 text-sm shadow-soft">
-                  Ready for a live map embed or real studio location photo.
+                  {address || "The studio address will appear here once salon details are saved."}
                 </div>
               </div>
             </div>
@@ -97,8 +92,20 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
                 <CardTitle>Reach the studio</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-                <p>{salon.phone ?? "Phone placeholder"}</p>
-                <p>{salon.email ?? "Email placeholder"}</p>
+                {salon.phone ? (
+                  <Link href={`tel:${salon.phone.replace(/\D/g, "")}`} className="block font-medium text-foreground transition-colors hover:text-primary">
+                    {salon.phone}
+                  </Link>
+                ) : (
+                  <p>Phone available on request</p>
+                )}
+                {salon.email ? (
+                  <Link href={`mailto:${salon.email}`} className="block font-medium text-foreground transition-colors hover:text-primary">
+                    {salon.email}
+                  </Link>
+                ) : (
+                  <p>Email available on request</p>
+                )}
               </CardContent>
             </Card>
 
@@ -113,9 +120,9 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
                   return (
                     <Link
                       key={link.label}
-                      href={link.href}
-                      target={link.href === "#" ? undefined : "_blank"}
-                      rel={link.href === "#" ? undefined : "noreferrer"}
+                      href={link.href ?? "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-sm text-foreground transition-colors hover:bg-secondary/55"
                     >
                       <span className="flex items-center gap-3">
@@ -171,4 +178,3 @@ export function ContactShowcaseSection({ salon, workingHours }: ContactShowcaseS
     </section>
   );
 }
-

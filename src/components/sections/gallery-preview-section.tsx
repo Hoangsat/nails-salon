@@ -25,7 +25,7 @@ export function GalleryPreviewSection({ items }: GalleryPreviewSectionProps) {
           <SectionHeading
             eyebrow="Portfolio Preview"
             title="A gallery presentation that feels closer to a real salon portfolio"
-            description="The preview now uses actual demo imagery from the structured gallery layer, with category labels and stronger visual treatment for a more credible sales experience."
+            description="The preview uses structured gallery imagery with category labels and stronger visual treatment for a more polished portfolio experience."
           />
           <Button asChild variant="outline">
             <Link href="/gallery">See the full gallery</Link>
