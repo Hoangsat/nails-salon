@@ -65,6 +65,16 @@ export function BookingFlow({ salon, minBookingDate, services, staff }: BookingP
     [availability?.slots, selectedSlotStartAt],
   );
 
+  const selectedAddonsTotal = useMemo(
+    () => selectedAddons.reduce((sum, addon) => sum + addon.priceCents, 0),
+    [selectedAddons],
+  );
+
+  const selectedAddonsDuration = useMemo(
+    () => selectedAddons.reduce((sum, addon) => sum + addon.durationMinutes, 0),
+    [selectedAddons],
+  );
+
   const customerValidation = {
     fullName: customerFullName.trim().length > 1,
     email: customerEmail.trim().includes("@"),
@@ -73,12 +83,11 @@ export function BookingFlow({ salon, minBookingDate, services, staff }: BookingP
 
   const hasEligibleStaff = eligibleStaff.length > 0;
   const quoteTotal =
-    selectedSlot?.totalPriceCents ?? availability?.quote.totalPriceCents ?? selectedService?.priceFromCents ?? 0;
+    selectedSlot?.totalPriceCents ??
+    ((selectedService?.priceFromCents ?? 0) + selectedAddonsTotal);
   const quoteDuration =
     selectedSlot?.totalDurationMinutes ??
-    availability?.quote.totalDurationMinutes ??
-    selectedService?.durationMinutes ??
-    0;
+    ((selectedService?.durationMinutes ?? 0) + selectedAddonsDuration);
 
   const canSubmit =
     !!selectedService &&

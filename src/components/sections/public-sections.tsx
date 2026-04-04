@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
-import { formatAddonPrice, formatDuration, formatPriceFrom } from "@/lib/data/formatters";
+import { formatDuration, formatPriceFrom } from "@/lib/data/formatters";
 import { groupServicesByCategory } from "@/lib/data/selectors";
 import type { SalonService } from "@/types/salon";
 import { Button } from "@/components/ui/button";
@@ -69,30 +69,6 @@ export function ServicesCatalogueSection({
                     </div>
 
                     <p className="leading-7 text-muted-foreground">{service.description}</p>
-
-                    {service.addons.length ? (
-                      <div className="rounded-[calc(var(--radius)-0.4rem)] bg-secondary/35 p-4">
-                        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Available add-ons
-                        </p>
-                        <div className="mt-3 space-y-3">
-                          {service.addons.map((addon) => (
-                            <div
-                              key={addon.id}
-                              className="flex flex-col gap-1 rounded-2xl bg-background/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-                            >
-                              <div>
-                                <p className="font-medium text-foreground">{addon.name}</p>
-                                <p className="text-sm text-muted-foreground">{addon.description}</p>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                + {formatAddonPrice(addon.priceCents, currencyCode)} / {formatDuration(addon.durationMinutes)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
                   </CardContent>
                 </Card>
               ))}
