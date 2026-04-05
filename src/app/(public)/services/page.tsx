@@ -13,8 +13,8 @@ export default async function ServicesPage() {
     <>
       <PageIntro
         eyebrow="Services"
-        title="A service menu that looks ready for real guests"
-        description="Services are grouped by category and presented with structured pricing, durations, and add-ons so the page feels closer to a live salon website than a simple brochure page."
+        title="A clear service menu for every appointment type"
+        description="Browse manicures, pedicures, BIAB, acrylics, removals, and nail design with clear prices and appointment times."
       />
       <ServicesCatalogueSection services={services} currencyCode={salon.currencyCode} />
       <CtaSection salon={salon} />

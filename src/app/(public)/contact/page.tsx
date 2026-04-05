@@ -10,8 +10,8 @@ export default async function ContactPage() {
     <>
       <PageIntro
         eyebrow="Contact"
-        title="Make it easy for guests to visit, message, and book"
-        description="Address, contact details, opening hours, and one-tap social/contact actions help guests reach the salon quickly and move confidently into booking."
+        title="Visit, message, or book with the studio"
+        description="Find the studio address, opening hours, and direct contact links for booking questions or quick messages."
       />
       <ContactShowcaseSection
         salon={salon}

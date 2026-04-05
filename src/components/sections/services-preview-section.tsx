@@ -28,8 +28,8 @@ export function ServicesPreviewSection({
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             eyebrow="Featured Services"
-            title="The services guests compare first, presented with clarity"
-            description="Featured services pull directly from the structured catalogue, including timing and price points, so the public page feels grounded in real operational data."
+            title="Popular services at a glance"
+            description="Browse some of the most-booked treatments first, with clear pricing and timing before moving into the full service menu."
           />
           <Button asChild variant="outline">
             <Link href="/services">Browse full service menu</Link>

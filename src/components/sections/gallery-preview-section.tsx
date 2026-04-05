@@ -24,8 +24,8 @@ export function GalleryPreviewSection({ items }: GalleryPreviewSectionProps) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             eyebrow="Portfolio Preview"
-            title="A gallery presentation that feels closer to a real salon portfolio"
-            description="The preview uses structured gallery imagery with category labels and stronger visual treatment for a more polished portfolio experience."
+            title="Recent work from the studio"
+            description="A quick look at recent sets, finishes, and design details to help new guests get a feel for the studio style."
           />
           <Button asChild variant="outline">
             <Link href="/gallery">See the full gallery</Link>

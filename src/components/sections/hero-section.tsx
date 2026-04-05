@@ -28,12 +28,12 @@ export function HeroSection({ salon, themeSettings, services, staff, gallery }: 
       <Container className="grid items-center gap-10 lg:grid-cols-[1.02fr,0.98fr]">
         <div className="space-y-8">
           <div className="space-y-4">
-            <Badge variant="outline">Premium nail studio website</Badge>
+            <Badge variant="outline">Corstorphine, Edinburgh</Badge>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
               {salon.tagline ?? "Refined nail artistry for modern guests"}
             </p>
             <h1 className="max-w-3xl text-balance font-heading text-5xl font-semibold tracking-tight text-foreground sm:text-6xl xl:text-7xl">
-              Precision manicures, polished pedicures, and design-led details guests will actually book.
+              Manicures, pedicures, BIAB, acrylics, and nail design at USA Nails Corstorphine.
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-muted-foreground">{salon.description}</p>
           </div>
@@ -82,10 +82,10 @@ export function HeroSection({ salon, themeSettings, services, staff, gallery }: 
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/45 via-foreground/5 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-background sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-background/80">
-                  Editorial studio imagery
+                  Studio highlights
                 </p>
                 <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                  Close-up nail detail, polish texture, and studio atmosphere take the lead in this opening frame.
+                  Browse recent sets, signature finishes, and the salon atmosphere before you book your next visit.
                 </h2>
               </div>
             </div>

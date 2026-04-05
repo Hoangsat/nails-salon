@@ -15,7 +15,7 @@ export async function SiteFooter() {
             {themeSettings.brandName}
           </p>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            A polished salon website with live booking, admin management, theme controls, and confirmation emails built on a reusable Next.js foundation.
+            Book appointments online, browse the latest services, and contact the studio quickly from one simple salon website.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export async function SiteFooter() {
             ))}
           </div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Live booking, light admin auth, and email confirmations included
+Online booking and confirmation emails available
           </p>
         </div>
       </Container>

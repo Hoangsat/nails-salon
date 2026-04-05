@@ -68,12 +68,6 @@ export async function AdminShell({
                   <ExternalLink className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="sm" className="justify-between">
-                <Link href="/for-salons" target="_blank" rel="noreferrer">
-                  View showcase page
-                  <ExternalLink className="h-4 w-4" />
-                </Link>
-              </Button>
             </div>
             <nav className="grid gap-2">
               {adminNav.map((item) => {

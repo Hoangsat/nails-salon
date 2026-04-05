@@ -99,9 +99,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
           <div className="flex flex-wrap gap-3">
             <Button asChild variant="outline">
-              <Link href="/for-salons">View showcase page</Link>
-            </Button>
-            <Button asChild variant="outline">
               <Link href="/">Back to public site</Link>
             </Button>
           </div>

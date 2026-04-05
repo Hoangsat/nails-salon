@@ -10,8 +10,8 @@ export default async function GalleryPage() {
     <>
       <PageIntro
         eyebrow="Gallery"
-        title="Portfolio-led presentation for the studio's visual identity"
-        description="The gallery uses structured image data in a more social, image-led layout so the portfolio feels closer to a real nail studio feed than a holding page."
+        title="Recent sets, finishes, and nail design inspiration"
+        description="Explore recent work from the studio, from clean everyday finishes to more detailed design-led sets."
       />
       <GalleryShowcaseSection items={gallery} />
       <CtaSection salon={salon} />

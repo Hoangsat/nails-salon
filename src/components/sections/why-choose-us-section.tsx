@@ -38,7 +38,7 @@ export function WhyChooseUsSection() {
         <SectionHeading
           eyebrow="Why Choose Us"
           title="Built around the standards guests look for in a premium salon"
-          description="This reusable section gives the site a stronger point of view around quality, experience, hygiene, and finish without depending on more complex booking or admin workflows."
+          description="Guests come back for high hygiene standards, careful finishing, and a calm appointment experience from start to finish."
         />
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

@@ -52,8 +52,8 @@ export function ValuePropositionSection({
         <div className="grid gap-6 lg:grid-cols-[1.15fr,0.85fr] lg:items-end">
           <SectionHeading
             eyebrow="Studio Value"
-            title="A salon experience that feels premium, credible, and ready to convert"
-            description={`${salon.name} presents like a real modern studio: coherent services, social proof, confident positioning, and a booking path guests can actually complete.`}
+            title="A salon experience built around quality, comfort, and lasting results"
+            description={`${salon.name} brings together a clear service menu, trusted client reviews, and a simple booking path so guests can choose and book with confidence.`}
           />
 
           <Card className="bg-secondary/35">

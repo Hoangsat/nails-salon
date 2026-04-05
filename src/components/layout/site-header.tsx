@@ -18,10 +18,7 @@ export async function SiteHeader() {
           </span>
           <div className="space-y-0.5">
             <p className="font-heading text-2xl font-semibold tracking-tight">{brandName}</p>
-            <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-              Showcase Platform
-            </p>
-          </div>
+                      </div>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-2">
