@@ -275,18 +275,19 @@ async function resolveAdminContext(): Promise<{ client: ReturnType<typeof create
     };
   }
 
-  const preferredSalon = await client
+  const activeSalon = await client
     .from("salons")
     .select("*")
-    .eq("slug", demoSalonProfile.slug)
     .eq("is_active", true)
+    .order("created_at", { ascending: true })
+    .limit(1)
     .maybeSingle();
 
-  if (preferredSalon.data) {
+  if (activeSalon.data) {
     return {
       client,
       context: {
-        salon: preferredSalon.data as SalonsRow,
+        salon: activeSalon.data as SalonsRow,
         isDemoMode: false,
       },
     };
@@ -295,7 +296,6 @@ async function resolveAdminContext(): Promise<{ client: ReturnType<typeof create
   const fallbackQuery = await client
     .from("salons")
     .select("*")
-    .eq("is_active", true)
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -308,10 +308,6 @@ async function resolveAdminContext(): Promise<{ client: ReturnType<typeof create
         isDemoMode: false,
       },
     };
-  }
-
-  if (!demoModeEnabled) {
-    throw new Error("No active salon record could be loaded for the admin.");
   }
 
   return {

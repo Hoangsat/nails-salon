@@ -35,8 +35,6 @@ import type {
   WorkingHoursEntry,
 } from "@/types/salon";
 
-const defaultSalonSlug = demoSalonProfile.slug;
-
 function resolveDemoFallback<T>(fallback: () => T, errorMessage: string): T {
   if (shouldAllowDemoFallback()) {
     return fallback();
@@ -45,23 +43,54 @@ function resolveDemoFallback<T>(fallback: () => T, errorMessage: string): T {
   throw new Error(errorMessage);
 }
 
-async function resolveSalonRow(client: SupabaseClient, slug: string) {
-  const { data, error } = await client
-    .from("salons")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .maybeSingle();
+type LegacySalonRow = Partial<SalonsRow> & { address?: string | null };
 
-  if (error || !data) {
-    return null;
+function normalizeSalonRow(row: LegacySalonRow): SalonsRow {
+  return {
+    id: row.id ?? demoSalonProfile.id,
+    slug: row.slug ?? demoSalonProfile.slug,
+    name: row.name ?? demoSalonProfile.name,
+    tagline: row.tagline ?? demoSalonProfile.tagline,
+    description: row.description ?? demoSalonProfile.description,
+    phone: row.phone ?? demoSalonProfile.phone,
+    email: row.email ?? demoSalonProfile.email,
+    address_line_1: row.address_line_1 ?? row.address ?? demoSalonProfile.addressLine1,
+    address_line_2: row.address_line_2 ?? demoSalonProfile.addressLine2,
+    city: row.city ?? demoSalonProfile.city,
+    region: row.region ?? demoSalonProfile.region,
+    postal_code: row.postal_code ?? demoSalonProfile.postalCode,
+    country_code: row.country_code ?? demoSalonProfile.countryCode,
+    timezone: row.timezone ?? demoSalonProfile.timezone,
+    currency_code: row.currency_code ?? demoSalonProfile.currencyCode,
+    website_url: row.website_url ?? demoSalonProfile.websiteUrl,
+    facebook_url: row.facebook_url ?? demoSalonProfile.facebookUrl,
+    instagram_url: row.instagram_url ?? demoSalonProfile.instagramUrl,
+    booking_notice: row.booking_notice ?? demoSalonProfile.bookingNotice,
+    is_active: row.is_active ?? demoSalonProfile.isActive,
+    created_at: row.created_at ?? demoSalonProfile.createdAt,
+    updated_at: row.updated_at ?? row.created_at ?? demoSalonProfile.updatedAt,
+  };
+}
+
+async function resolveSalonRow(client: SupabaseClient) {
+  const attempts = [
+    () => client.from("salons").select("*").eq("is_active", true).limit(1).maybeSingle(),
+    () => client.from("salons").select("*").limit(1).maybeSingle(),
+  ];
+
+  for (const runAttempt of attempts) {
+    const { data, error } = await runAttempt();
+
+    if (!error && data) {
+      return normalizeSalonRow(data as LegacySalonRow);
+    }
   }
 
-  return data as SalonsRow;
+  return null;
 }
 
 async function withSalonFallback<T>(
-  slug: string,
+  _slug: string | undefined,
   query: (client: SupabaseClient, salonRow: SalonsRow) => Promise<T>,
   fallback: () => T,
 ): Promise<T> {
@@ -72,10 +101,10 @@ async function withSalonFallback<T>(
   }
 
   try {
-    const salonRow = await resolveSalonRow(client, slug);
+    const salonRow = await resolveSalonRow(client);
 
     if (!salonRow) {
-      return resolveDemoFallback(fallback, `Active salon '${slug}' could not be loaded.`);
+      return fallback();
     }
 
     return await query(client, salonRow);
@@ -88,16 +117,16 @@ async function withSalonFallback<T>(
   }
 }
 
-export const getSalonProfile = cache(async (slug = defaultSalonSlug): Promise<SalonProfile> => {
+export const getSalonProfile = cache(async (slug = undefined): Promise<SalonProfile> => {
   return withSalonFallback(
     slug,
-    async (_client, salonRow) => mapSalonRow(salonRow),
+    async (_client, salonRow) => mapSalonRow(normalizeSalonRow(salonRow as LegacySalonRow)),
     () => demoSalonDataset.salon,
   );
 });
 
 export const getSalonThemeSettings = cache(
-  async (slug = defaultSalonSlug): Promise<SalonThemeSettings> => {
+  async (slug = undefined): Promise<SalonThemeSettings> => {
     return withSalonFallback(
       slug,
       async (client, salonRow) => {
@@ -121,7 +150,7 @@ export const getSalonThemeSettings = cache(
   },
 );
 
-export const getSalonStaff = cache(async (slug = defaultSalonSlug): Promise<StaffMember[]> => {
+export const getSalonStaff = cache(async (slug = undefined): Promise<StaffMember[]> => {
   return withSalonFallback(
     slug,
     async (client, salonRow) => {
@@ -143,7 +172,7 @@ export const getSalonStaff = cache(async (slug = defaultSalonSlug): Promise<Staf
 });
 
 export const getSalonWorkingHours = cache(
-  async (slug = defaultSalonSlug): Promise<WorkingHoursEntry[]> => {
+  async (slug = undefined): Promise<WorkingHoursEntry[]> => {
     return withSalonFallback(
       slug,
       async (client, salonRow) => {
@@ -169,7 +198,7 @@ export const getSalonWorkingHours = cache(
 );
 
 export const getSalonServicesWithAddons = cache(
-  async (slug = defaultSalonSlug): Promise<SalonService[]> => {
+  async (slug = undefined): Promise<SalonService[]> => {
     return withSalonFallback(
       slug,
       async (client, salonRow) => {
@@ -226,7 +255,7 @@ export const getSalonServicesWithAddons = cache(
   },
 );
 
-export const getSalonGallery = cache(async (slug = defaultSalonSlug): Promise<GalleryImage[]> => {
+export const getSalonGallery = cache(async (slug = undefined): Promise<GalleryImage[]> => {
   return withSalonFallback(
     slug,
     async (client, salonRow) => {
@@ -247,7 +276,7 @@ export const getSalonGallery = cache(async (slug = defaultSalonSlug): Promise<Ga
   );
 });
 
-export const getSalonReviews = cache(async (slug = defaultSalonSlug): Promise<Review[]> => {
+export const getSalonReviews = cache(async (slug = undefined): Promise<Review[]> => {
   return withSalonFallback(
     slug,
     async (client, salonRow) => {
@@ -268,7 +297,7 @@ export const getSalonReviews = cache(async (slug = defaultSalonSlug): Promise<Re
   );
 });
 
-export const getPublicHomePageData = cache(async (slug = defaultSalonSlug) => {
+export const getPublicHomePageData = cache(async (slug = undefined) => {
   const [salon, themeSettings, services, gallery, reviews, staff] = await Promise.all([
     getSalonProfile(slug),
     getSalonThemeSettings(slug),
@@ -288,7 +317,7 @@ export const getPublicHomePageData = cache(async (slug = defaultSalonSlug) => {
   };
 });
 
-export const getPublicContactPageData = cache(async (slug = defaultSalonSlug) => {
+export const getPublicContactPageData = cache(async (slug = undefined) => {
   const [salon, workingHours] = await Promise.all([
     getSalonProfile(slug),
     getSalonWorkingHours(slug),
@@ -300,7 +329,7 @@ export const getPublicContactPageData = cache(async (slug = defaultSalonSlug) =>
   };
 });
 
-export const getPublicBookingPageData = cache(async (slug = defaultSalonSlug) => {
+export const getPublicBookingPageData = cache(async (slug = undefined) => {
   const [salon, services, staff] = await Promise.all([
     getSalonProfile(slug),
     getSalonServicesWithAddons(slug),
